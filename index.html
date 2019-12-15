@@ -1,0 +1,204 @@
+<!DOCTYPE HTML>
+<!-- This is the home page of the ComplexFinder web application. This page --
+  -- also uses the cytoscape web to display the visualization of the --
+  -- network. For the clustering part, this web application sends a --
+  -- request to the server, lets the server to run the clustering --
+  -- algorithm and receives the result from the server -->
+<html lang="en">
+	<head>
+	
+	<meta charset="utf-8">
+
+	<!-- Axios -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.min.js"></script>
+	
+	<!-- Cytoscape JS API -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/2.7.10/cytoscape.js"></script>
+	
+	<!-- jquery API -->
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+	
+	<!-- Bootstrap API -->
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+	
+	<!-- This script is for complexfinder clustering -->
+	<script type="text/javascript" src="js/general_js/graph.js"></script>
+
+	<!-- This script is used to initialize the events -->
+	<script type="text/javascript" src="js/general_js/init.js"></script>
+
+	<!-- This script contains the javascript for the zoom buttons -->
+	<script src="js/panzoom/cytoscape-panzoom.js"></script>
+	
+	<!-- initialize all stuffs here -->
+	<script type="text/javascript">
+	  init_document();
+	</script>
+
+	<!-- style sheets -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+	<link href="js/panzoom/font-awesome-4.0.3/css/font-awesome.css" rel="stylesheet" type="text/css" />
+	<link href="js/panzoom/cytoscape.js-panzoom.css" rel="stylesheet" type="text/css" />
+	<link rel="stylesheet" href="css/general_design.css" type="text/css" media="screen" />
+	
+	<!-- title that appears in browser tab -->
+	<title>SSFinder</title>
+	</head>
+
+	<body>
+		<!-- a wrapper for the whole page -->
+		<div id="content-div">
+			<div id="top-div">
+				<div id="logo-div">
+					<div id="img-div">
+						<img align="top" height="160" src="css/Logo.png" width="400">
+					</div>
+				</div>
+				<!-- Div for clustering options -->
+				<div id="options-div">
+					<table id="options-table" align="right">
+						<tbody>
+							<tr>
+								<td>
+									<label for="gene1">
+										<b>Gene 1</b>
+									</label>
+								</td>
+								<td>
+									<input type="text" name="gene1" id="gene1">
+								</td>
+							</tr>
+							<tr>
+								<td>
+									<label for="gene2">
+										<b>Gene 2</b>
+									</label>
+								</td>
+								<td>
+									<input type="text" name="gene2" id="gene2">
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div> <!-- options-div -->
+
+				<!-- a div for all buttons -->
+				<div id="button-div">
+				<ul id="button-ul" >
+					<!-- button for running -->
+					<li><button class="btn" type="button" id="run-button"><font color="rgb(60,110,150)"><b>RUN</b></font></button></li>
+
+					<!-- button for reset -->
+					<li><button class="btn" type="button" id="reset-button"><font color="rgb(60,110,150)"><b>RESET</b></font></button></li>
+
+					<!-- button for downloading -->
+					<!--<li><button class="btn" type="button" id="modal-button"><font color="rgb(60,110,150)"><b>DOWNLOAD</b></font></button></li>-->
+				</ul>
+				</div> <!-- button-div -->
+
+				<div id="download-div" class="modal">
+
+				<!-- header and close button -->
+					<div class="modal-header">
+						<a class="close" data-dismiss="modal">x</a>
+						<h3>Download</h3>
+					</div>
+
+					<!-- body div for the modal -->
+					<div class="modal-body">
+						<label for="format">Format</label>
+						<select id="format">
+							<option value="png">png</option>
+							<option value="svg">svg</option>
+							<option value="pdf">pdf</option>
+							<option value="xgmml">xgmml</option>
+							<option value="graphml">graphml</option>
+							<option value="sif">sif</option>
+						</select>
+					</div>
+
+					<!-- footer -->
+					<div class="modal-footer">
+						<button class="btn btn-primary" type="button" id="download-button">Download</button>
+						<a id="modal-close-button" href="#" class="btn">Close</a>
+					</div>
+				</div> <!-- download-div -->
+			</div> <!-- top-div -->
+
+			<div id="bottom-div">
+			<!-- a div for displaying waiting information -->
+				<div class="alert" id="message-div">
+					Please enter two starting genes.
+				</div>
+
+				<!-- a div for descriptions -->
+				<div id="description-div">
+				<table align="center" cellpadding="18"><tr><td>
+					<body>
+						<p><b>SSFinder</b> is an interactive web application to visualize the <b>interaction
+							patterns</b> between the two genes entered by a user. This tool is only available
+							for <b>H. sapiens.</b></p>
+						<p><b>SSFinder</b> has two major technical components: weighting genome-wide
+							protein-protein interaction data by measuring semantic similarity through a
+							<b>double normalized formula</b> and reconstructing signaling pathways from
+							the weighted protein-protein interaction network by the <b>information propagation
+								algorithm</b>.</p>
+						<p><b>SSFinder</b> provides the detailed information of each gene and each edge in the
+							visualized network.</p>
+						<b>Follow the instruction below.</b>
+						<ol>
+							<li>Type gene names or symbols into the Gene 1 and Gene 2 boxes.</li>
+							<li>Click "RUN" to visualize the signaling pathways. (It usually takes between
+								20 ~ 60 seconds. It will not allow for visualizations that take longer than
+								60 seconds to complete.)</li>
+							<li>Click any gene or signaling edge on the visualized network to obtain its
+								detailed information.</li>
+							<li>Drag any node or edge to re-structure the visualized network.</li>
+						</ol>
+
+
+					</body>
+				</td></tr></table>
+				</div>
+
+				<!-- a div for showing network output -->
+				<div id="output-div">
+
+					<!-- a div for showing graph -->
+					<div id="network-div">			
+					</div>
+
+				<!-- a div for showing information about the graph -->
+					<div id="info-div">
+
+					<!-- a tab for displaying info -->
+					<div id="info-tabs" onclick="temp_function()" >
+					<ul>
+						<li class="active"><a id="tab1" href="#tab-content1" data-toggle="tab">General info tab will show here.</a></li>
+						<li><a id="tab2" href="#tab-content2" data-toggle="tab">Node/Edge info tab will show here.</a></li>
+					</ul>
+					<div class="tab-content">
+						<div class="tab-pane active" id="tab-content1">General information will show here.</div>
+						<div class="tab-pane" id="tab-content2" >Node or edge specific information will show here.</div>
+					</div>
+					</div>
+
+					</div>
+				</div>
+
+			</div>
+			<div class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" id="countdownmodal" data-content="" >
+				<div class="modal-dialog modal-lg" role="document">
+					<div class="modal-content">
+						<div class="modal-header">
+							<button type="button" class="close" data-dismiss="modal">x</button>
+							<h3>Determining information around query genes. </h3>
+						</div>
+							<div class="modal-body" id="modalcd"> </div>
+					</div>
+				</div>
+			</div>
+			
+		</div> <!-- content-div -->
+	</body>
+</html>
